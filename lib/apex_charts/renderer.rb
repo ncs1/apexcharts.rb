@@ -22,8 +22,11 @@ module ApexCharts
       html = window_apex if id_number == '1' && !ApexCharts.config.default_options.empty?
 
       chart_rendering = <<~JS
-        var #{variable} = new ApexCharts(document.querySelector("##{element_id}"), #{substitute_function_object(options.to_json)});
-        #{variable}.render();
+        var #{variable} = [
+          "#{element_id}",
+          #{substitute_function_object(options.to_json)}
+        ];
+        SurfyUtils.add_apexobj(#{variable});
       JS
 
       html += <<~HTML
@@ -36,15 +39,17 @@ module ApexCharts
       if defer?
         <<~DEFERRED
           (function() {
-            var createChart = function() {
+            var createChart = function cb(event) {
               #{indent(js)}
+
+              event.currentTarget.removeEventListener(event.type, cb);
             };
-            if (window.addEventListener) {
-              window.addEventListener("load", createChart, true);
-            } else if (window.attachEvent) {
-              window.attachEvent("onload", createChart);
+
+            if (!!window.addEventListener) {
+              window.addEventListener('load', createChart, true);
+              window.addEventListener('turbolinks:load', createChart, true);
             } else {
-              createChart();
+              console.log("ERROR: window.addEventListener undefined");
             }
           })();
         DEFERRED
@@ -54,9 +59,9 @@ module ApexCharts
     end
 
     def substitute_function_object(json)
-      json.gsub(%r[{"function":{"args":"(?<args>.*?)","body":"(?<body>.*?)"}}]) do
-        body = "\"#{$~&.[](:body)}\"".undump
-        "function(#{$~&.[](:args)}){#{body}}"
+      json.gsub(/{"function":{"args":"(?<args>.*?)","body":"(?<body>.*?)"}}/) do
+        body = "\"#{$LAST_MATCH_INFO&.[](:body)}\"".undump
+        "function(#{$LAST_MATCH_INFO&.[](:args)}){#{body}}"
       end
     end
 
@@ -106,7 +111,7 @@ module ApexCharts
 
     def indent(content, times=2)
       content.lines.map.with_index do |line, index|
-        (index == 0 ? '' : '  ' * times) + line
+        (index.zero? ? '' : '  ' * times) + line
       end.join
     end
   end
