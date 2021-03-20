@@ -53,9 +53,6 @@ Style/Alias:
 Style/BlockDelimiters:
   Enabled: false
 
-Style/BracesAroundHashParameters:
-  EnforcedStyle: context_dependent
-
 Style/ClassVars:
   Exclude:
     - 'lib/apex_charts/prefixer.rb'
