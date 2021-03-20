@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'helper_options'
 require_relative 'chart_options'
 require_relative 'stroke_options'

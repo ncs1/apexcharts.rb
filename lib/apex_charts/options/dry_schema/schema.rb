@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dry/schema'
 
 Dry::Schema.config.validate_keys = true
@@ -18,13 +20,13 @@ module ApexCharts::Options
         end
 
         def keys
-          definition.send(:key_map).map{|key| key.name.to_sym }
+          definition.send(:key_map).map {|key| key.name.to_sym }
         end
 
       private
 
         def production?
-          (ENV['APP_ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']) == "production"
+          (ENV['APP_ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']) == 'production'
         end
       end
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-%w(default dry_schema).each do |schema_dir|
+%w[default dry_schema].each do |schema_dir|
   require_relative "options/#{schema_dir}/root_options"
   require_relative "options/#{schema_dir}/annotations_options"
   require_relative "options/#{schema_dir}/data_labels_options"
@@ -79,9 +79,7 @@ module ApexCharts
     def build_annotations
       annotations = @options.delete :annotations
       @built[:annotations] = (
-        if annotations.is_a? Hash
-          options_class(:Annotations).check annotations.compact
-        end
+        options_class(:Annotations).check annotations.compact if annotations.is_a? Hash
       )
     end
 
@@ -137,12 +135,12 @@ module ApexCharts
       @built[:defer] = defer == true
     end
 
-
     def build_fill
       fill = @options.delete :fill
-      @built[:fill] = if fill.is_a? String
+      @built[:fill] = case fill
+                      when String
                         {type: fill}
-                      elsif fill.is_a? Hash
+                      when Hash
                         options_class(:Fill).check fill.compact
                       end
     end
@@ -175,18 +173,20 @@ module ApexCharts
 
     def build_markers
       markers = @options.delete :markers
-      @built[:markers] = if markers.is_a? String
+      @built[:markers] = case markers
+                         when String
                            {shape: markers}
-                         elsif markers.is_a? Hash
+                         when Hash
                            options_class(:Markers).check markers.compact
                          end
     end
 
     def build_no_data
       no_data = @options.delete :noData
-      @built[:noData] = if no_data.is_a? String
+      @built[:noData] = case no_data
+                        when String
                           {text: no_data}
-                        elsif no_data.is_a? Hash
+                        when Hash
                           options_class(:NoData).check no_data.compact
                         end
     end
@@ -234,16 +234,18 @@ module ApexCharts
 
     def build_subtitle
       subtitle = @options.delete(:subtitle)
-      @built[:subtitle] = if subtitle.is_a? String
+      @built[:subtitle] = case subtitle
+                          when String
                             {text: subtitle}
-                          elsif subtitle.is_a? Hash
+                          when Hash
                             options_class(:TitleSubtitle).check subtitle.compact
                           end
     end
 
     def build_theme
       theme = @options.delete(:theme)
-      @built[:theme] = if theme.is_a? String
+      @built[:theme] = case theme
+                       when String
                          case theme
                          when 'random'
                            resolve_theme(Theme.all_palettes.sample)
@@ -252,16 +254,17 @@ module ApexCharts
                          else
                            resolve_theme(theme)
                          end
-                       elsif theme.is_a? Hash
+                       when Hash
                          options_class(:Theme).check theme.compact
                        end
     end
 
     def build_title
       title = @options.delete(:title)
-      @built[:title] = if title.is_a? String
+      @built[:title] = case title
+                       when String
                          {text: title}
-                       elsif title.is_a? Hash
+                       when Hash
                          options_class(:TitleSubtitle).check title.compact
                        end
     end
@@ -285,9 +288,10 @@ module ApexCharts
       }.compact
       @built[:xaxis].delete(:title) if @built[:xaxis][:title].empty?
 
-      if xaxis.is_a? String
+      case xaxis
+      when String
         @built[:xaxis][:title] = {text: xaxis}
-      elsif xaxis.is_a? Hash
+      when Hash
         options_class(:XAxis).check xaxis
         @built[:xaxis].merge! xaxis
       end
@@ -305,9 +309,10 @@ module ApexCharts
       }.compact]
       @built[:yaxis][0].delete(:title) if @built[:yaxis][0][:title].empty?
 
-      if yaxis.is_a? String
+      case yaxis
+      when String
         @built[:yaxis][0][:title] = {text: yaxis}
-      elsif yaxis.is_a? Hash
+      when Hash
         options_class(:YAxis).check yaxis
         @built[:yaxis][0].merge! yaxis
       end
@@ -334,9 +339,10 @@ module ApexCharts
     end
 
     def filter_type_hash(state)
-      if state.is_a? String
+      case state
+      when String
         {filter: {type: state}}
-      elsif state.is_a? Hash
+      when Hash
         state.compact
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApexCharts::Options
   module Default
     class ThemeOptions < ::SmartKv

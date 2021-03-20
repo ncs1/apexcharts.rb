@@ -20,8 +20,8 @@ module ApexCharts::Series
           end
 
         when Hash
-          if data_value = data[:data]
-            [data] if array_of_threes?(data_value)
+          if data_value = data[:data] && array_of_threes?(data_value)
+            [data]
           end
 
         end
